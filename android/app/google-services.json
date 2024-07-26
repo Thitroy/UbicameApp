@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "251613480140",
+    "project_id": "ubicameappbd-a5797",
+    "storage_bucket": "ubicameappbd-a5797.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:251613480140:android:258eccfa80f77c090bee69",
+        "android_client_info": {
+          "package_name": "com.ubicame.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDNbWHZdal9za5OU6Zvrcu-1DsLe1rom4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
