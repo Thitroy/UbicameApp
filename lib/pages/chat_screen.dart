@@ -33,19 +33,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _initializeDialogFlowtter() async {
     try {
-      DialogAuthCredentials credentials =
-          await DialogAuthCredentials.fromFile('comprobante.json');
+      DialogAuthCredentials credentials = await DialogAuthCredentials.fromFile(
+          'assets/bionic-torch-426906-t5-d65287af1c43.json');
       dialogFlowtter = DialogFlowtter(credentials: credentials);
+      print('DialogFlowtter initialized successfully.');
       setState(() {});
     } catch (e) {
       print('Error loading DialogFlowtter: $e');
+      _receiveMessage("Error cargando DialogFlowtter: $e");
     }
   }
 
-  void _sendMessage() async {
-    if (_controller.text.isNotEmpty && dialogFlowtter != null) {
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
       setState(() {
-        _messages.add(Message(_controller.text));
+        _messages.add(Message(_controller.text, isUserMessage: true));
         if (_showWelcomeMessage) {
           _showWelcomeMessage = false;
         }
@@ -57,38 +59,42 @@ class _ChatScreenState extends State<ChatScreen> {
       if (userMessage == 'usuario administrador') {
         _receiveAdminMessage();
       } else {
-        _receiveMessage(await _dialogflowRequest(userMessage));
+        _handleDialogflowRequest(userMessage);
       }
     }
   }
 
-  Future<String> _dialogflowRequest(String query) async {
+  void _handleDialogflowRequest(String query) async {
     try {
       if (dialogFlowtter == null) {
-        return "DialogFlowtter no está inicializado.";
+        _receiveMessage("DialogFlowtter no está inicializado.");
+        return;
       }
 
       DetectIntentResponse response = await dialogFlowtter!.detectIntent(
         queryInput: QueryInput(text: TextInput(text: query)),
       );
 
-      print('Intent response: ${response.queryResult}');
+      print(
+          'Detect Intent Response: ${response.toJson()}'); // Imprime la respuesta completa
 
       String responseMessage = 'No se recibió respuesta.';
 
       if (response.queryResult != null) {
-        final queryResult = response.queryResult!;
-        responseMessage = _getResponseMessage(queryResult);
+        responseMessage = _getResponseMessage(response.queryResult!);
       }
 
-      return responseMessage;
+      _receiveMessage(responseMessage);
     } catch (e) {
       print("Error en Dialogflow: $e");
-      return "Lo siento, no puedo procesar tu solicitud en este momento.";
+      _receiveMessage(
+          "Lo siento, no puedo procesar tu solicitud en este momento.");
     }
   }
 
   String _getResponseMessage(QueryResult queryResult) {
+    print(
+        'Query Result: ${queryResult.toJson()}'); // Imprime todos los detalles del QueryResult
     if (queryResult.fulfillmentMessages != null &&
         queryResult.fulfillmentMessages!.isNotEmpty) {
       return queryResult.fulfillmentMessages!
@@ -178,161 +184,134 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initializeDialogFlowtter(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Cargando...'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/logo.png',
+              width: 30,
+              height: 30,
             ),
-            body: const Center(
-              child: CircularProgressIndicator(),
+            const SizedBox(width: 10),
+            const Text(
+              'Chatbot',
+              style: TextStyle(color: Colors.white),
             ),
-          );
-        } else if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Error'),
+          ],
+        ),
+        backgroundColor: const Color(0xFF002B5C),
+      ),
+      body: GestureDetector(
+        onTap: () {
+          if (_showWelcomeMessage) {
+            setState(() {
+              _showWelcomeMessage = false;
+            });
+          }
+        },
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF002B5C), Color(0xFF003F7F)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            body: Center(
-              child: Text(
-                  'Error al inicializar DialogFlowtter: ${snapshot.error}'),
-            ),
-          );
-        } else {
-          return Scaffold(
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  Image.asset(
-                    'assets/logo.png',
-                    width: 30,
-                    height: 30,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Chatbot',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-              backgroundColor: const Color(0xFF002B5C),
-            ),
-            body: GestureDetector(
-              onTap: () {
-                if (_showWelcomeMessage) {
-                  setState(() {
-                    _showWelcomeMessage = false;
-                  });
-                }
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF002B5C), Color(0xFF003F7F)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Stack(
+          ),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Opacity(
-                                  opacity: 0.3,
-                                  child: Image.asset(
-                                    'assets/chatbot_logo.png',
-                                    width: 200,
-                                    height: 200,
-                                  ),
-                                ),
-                                if (_showWelcomeMessage)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
-                                    child: Center(
-                                      child: AnimatedTextKit(
-                                        animatedTexts: [
-                                          TypewriterAnimatedText(
-                                            'Bienvenido al Chatbot UbícameUBB!',
-                                            textStyle: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            speed: const Duration(
-                                                milliseconds: 100),
-                                          ),
-                                        ],
-                                        totalRepeatCount: 1,
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                          Opacity(
+                            opacity: 0.3,
+                            child: Image.asset(
+                              'assets/chatbot_logo.png',
+                              width: 200,
+                              height: 200,
                             ),
                           ),
-                          ListView.builder(
-                            padding: const EdgeInsets.all(8.0),
-                            itemCount: _messages.length,
-                            itemBuilder: (context, index) {
-                              final message = _messages[index];
-                              return Align(
-                                alignment: message.isUserMessage
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: _buildMessage(message),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              controller: _controller,
-                              onTap: () {
-                                if (_showWelcomeMessage) {
-                                  setState(() {
-                                    _showWelcomeMessage = false;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Escribe un mensaje...',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide.none,
+                          if (_showWelcomeMessage)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Center(
+                                child: AnimatedTextKit(
+                                  animatedTexts: [
+                                    TypewriterAnimatedText(
+                                      'Bienvenido al Chatbot UbícameUBB!',
+                                      textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      speed: const Duration(milliseconds: 100),
+                                    ),
+                                  ],
+                                  totalRepeatCount: 1,
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(Icons.send),
-                            onPressed: _sendMessage,
-                            color: Colors.white,
-                          ),
                         ],
                       ),
+                    ),
+                    ListView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        return Align(
+                          alignment: message.isUserMessage
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: _buildMessage(message),
+                        );
+                      },
                     ),
                   ],
                 ),
               ),
-            ),
-          );
-        }
-      },
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        onTap: () {
+                          if (_showWelcomeMessage) {
+                            setState(() {
+                              _showWelcomeMessage = false;
+                            });
+                          }
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Escribe un mensaje...',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _sendMessage,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
