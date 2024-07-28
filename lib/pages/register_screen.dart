@@ -1,76 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'home_screen.dart';
-import 'register_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ubicameapp/preferences/pref_users.dart';
-import '/util/snackbar.dart';
+import '/util/snackbar.dart'; // Asegúrate de importar correctamente el archivo snackbar.dart
+import '/provider/auth.dart'; // Asegúrate de importar correctamente el paquete provider.dart
+import 'package:cloud_firestore/cloud_firestore.dart'; // Asegúrate de importar correctamente el paquete cloud_firestore.dart
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  var prefs = PreferencesUsers();
   final _formKey = GlobalKey<FormState>();
   String _username = '';
   String _password = '';
+  String _confirmPassword = '';
   bool _isUsernameEmpty = false;
   bool _isPasswordEmpty = false;
+  bool _isConfirmPasswordEmpty = false;
+  bool _isPasswordMismatch = false;
 
-  Future<void> _login() async {
+  final AuthService _authService = AuthService();
+
+  Future<void> _register() async {
     setState(() {
       _isUsernameEmpty = _username.isEmpty;
       _isPasswordEmpty = _password.isEmpty;
+      _isConfirmPasswordEmpty = _confirmPassword.isEmpty;
+      _isPasswordMismatch = _password != _confirmPassword;
     });
 
-    if (_isUsernameEmpty && _isPasswordEmpty) {
-      showSnackBar(context, "Por favor, ingrese su usuario y contraseña");
+    if (_isUsernameEmpty && _isPasswordEmpty && _isConfirmPasswordEmpty) {
+      showSnackBar(context, "Por favor, ingrese todos los datos");
     } else if (_isUsernameEmpty) {
       showSnackBar(context, "Por favor, ingrese su usuario");
     } else if (_isPasswordEmpty) {
       showSnackBar(context, "Por favor, ingrese su contraseña");
+    } else if (_isConfirmPasswordEmpty) {
+      showSnackBar(context, "Por favor, confirme su contraseña");
+    } else if (_isPasswordMismatch) {
+      showSnackBar(context, "Las contraseñas no coinciden");
     } else {
-      try {
-        UserCredential userCredential =
-            await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _username,
-          password: _password,
-        );
-        if (userCredential.user != null) {
-          var userDoc = await FirebaseFirestore.instance
-              .collection('user')
-              .doc(userCredential.user!.uid)
-              .get();
-          if (userDoc.exists) {
-            PreferencesUsers prefs = PreferencesUsers();
-            prefs.lastuid = userCredential.user!.uid;
-            prefs.role = userDoc['rol']; // Asegúrate de que el campo sea 'rol'
+      // Verificar si el correo ya está registrado en Firestore
+      var existingUser = await FirebaseFirestore.instance
+          .collection('user')
+          .where('email', isEqualTo: _username)
+          .get();
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomeScreen(
-                      role: userDoc[
-                          'rol'])), // Asegúrate de que el campo sea 'rol'
-            );
-          } else {
-            showSnackBar(context, "Ocurrió un error. Inténtalo de nuevo.");
-          }
-        }
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          showSnackBar(
-              context, "No existe un usuario con ese correo electrónico.");
-        } else if (e.code == 'wrong-password') {
-          showSnackBar(context, "Contraseña incorrecta.");
-        } else {
+      if (existingUser.docs.isNotEmpty) {
+        showSnackBar(context, "El correo electrónico ya está en uso.");
+      } else {
+        var result = await _authService.createAccount(_username, _password);
+
+        if (result == 1) {
+          showSnackBar(context, "La contraseña es demasiado débil.");
+        } else if (result == 2) {
+          showSnackBar(context, "El correo electrónico ya está en uso.");
+        } else if (result == null) {
           showSnackBar(context, "Ocurrió un error. Inténtalo de nuevo.");
+        } else {
+          // Almacenar los datos del usuario en Firestore
+          prefs.lastuid = result;
+          await FirebaseFirestore.instance.collection('user').doc(result).set({
+            'email': _username,
+            'password': _password,
+            'rol': 'estudiante', // Agregar rol de estudiante por defecto
+          });
+
+          // Mostrar un mensaje de éxito y permanecer en la pantalla
+          showSnackBar(context, "Usuario registrado exitosamente.");
+
+          // Limpiar los campos de texto
+          setState(() {
+            _username = '';
+            _password = '';
+            _confirmPassword = '';
+          });
         }
-      } catch (e) {
-        showSnackBar(context, "Ocurrió un error. Inténtalo de nuevo.");
       }
     }
   }
@@ -80,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Inicio de Sesión',
+          'Registro',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF002B5C),
@@ -174,8 +182,42 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Confirmar Contraseña',
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.8),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(
+                              color:
+                                  _isConfirmPasswordEmpty || _isPasswordMismatch
+                                      ? Colors.red
+                                      : Colors.transparent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(
+                              color:
+                                  _isConfirmPasswordEmpty || _isPasswordMismatch
+                                      ? Colors.red
+                                      : Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        obscureText: true,
+                        onChanged: (value) {
+                          setState(() {
+                            _confirmPassword = value;
+                            _isConfirmPasswordEmpty = _confirmPassword.isEmpty;
+                            _isPasswordMismatch = _password != _confirmPassword;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: _login,
+                        onPressed: _register,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white.withOpacity(0.8),
                           foregroundColor: const Color(0xFF002B5C),
@@ -186,24 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        child: const Text('Iniciar Sesión'),
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const RegisterScreen()),
-                          );
-                        },
-                        child: const Text(
-                          '¿No tienes cuenta?',
-                          style: TextStyle(
-                            color: Colors.white,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
+                        child: const Text('Registrarse'),
                       ),
                     ],
                   ),

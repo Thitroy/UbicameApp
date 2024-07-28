@@ -5,9 +5,12 @@ import '/pages/google_map_page.dart';
 import '/pages/preguntas_frecuentes.dart';
 import '/pages/ubicaciones_frecuentes.dart';
 import 'dart:ui';
+import 'register_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String role;
+
+  const HomeScreen({super.key, required this.role});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -15,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late VideoPlayerController _controller;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -34,15 +38,35 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _onNumberTap(BuildContext context, int number) {
-    if (number == 1) {
-      Navigator.pushNamed(context, "map");
-    } else if (number == 2) {
-      Navigator.pushNamed(context, "chat");
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Número $number tocado')),
-      );
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, "map");
+        break;
+      case 1:
+        Navigator.pushNamed(context, "chat");
+        break;
+      case 2:
+        Navigator.pushNamed(context, "preguntas");
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UbicacionesFrecuentes()),
+        );
+        break;
+      case 4:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+        );
+        break;
+      case 5:
+        // Implementa la navegación para crear ubicaciones
+        break;
     }
   }
 
@@ -148,91 +172,58 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          Positioned(
-            left: 100,
-            top: 200,
-            child: GestureDetector(
-              onTap: () => _onNumberTap(context, 1),
-              child: Container(
-                width: 50,
-                height: 50,
-                color: Colors.transparent,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 200,
-            top: 300,
-            child: GestureDetector(
-              onTap: () => _onNumberTap(context, 2),
-              child: Container(
-                width: 50,
-                height: 50,
-                color: Colors.transparent,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            child: Column(
-              children: [
-                FloatingActionButton(
-                  onPressed: () {
-                    _controller.pause();
-                    Navigator.pushNamed(context, "chat").then((_) {
-                      _controller.play();
-                    });
-                  },
-                  backgroundColor: Colors.blue,
-                  child: const Icon(Icons.chat, color: Colors.white),
-                  heroTag: 'chatbot',
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: widget.role == 'admin'
+            ? const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.map),
+                  label: 'Mapa',
                 ),
-                const SizedBox(height: 10),
-                FloatingActionButton(
-                  onPressed: () {
-                    _controller.pause();
-                    Navigator.pushNamed(context, "map").then((_) {
-                      _controller.play();
-                    });
-                  },
-                  backgroundColor: Colors.green,
-                  child: const Icon(Icons.location_on, color: Colors.white),
-                  heroTag: 'location',
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.chat),
+                  label: 'Chat',
                 ),
-                const SizedBox(height: 10),
-                FloatingActionButton(
-                  onPressed: () {
-                    _controller.pause();
-                    Navigator.pushNamed(context, "preguntas").then((_) {
-                      _controller.play();
-                    });
-                  },
-                  backgroundColor: Colors.red,
-                  child: const Icon(Icons.help, color: Colors.white),
-                  heroTag: 'preguntas',
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.help),
+                  label: 'Preguntas',
                 ),
-                const SizedBox(height: 10),
-                FloatingActionButton(
-                  onPressed: () {
-                    _controller.pause();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UbicacionesFrecuentes(),
-                      ),
-                    ).then((_) {
-                      _controller.play();
-                    });
-                  },
-                  backgroundColor: Colors.orange,
-                  child: const Icon(Icons.location_city, color: Colors.white),
-                  heroTag: 'ubicaciones',
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.location_city),
+                  label: 'Ubicaciones',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person_add),
+                  label: 'Crear Usuario',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.location_on),
+                  label: 'Crear Ubicación',
+                ),
+              ]
+            : const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.map),
+                  label: 'Mapa',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.chat),
+                  label: 'Chat',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.help),
+                  label: 'Preguntas',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.location_city),
+                  label: 'Ubicaciones',
                 ),
               ],
-            ),
-          ),
-        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }

@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'login_screen.dart'; // Asegúrate de importar la pantalla de login.
 
 class Message {
   final String text;
   final bool isUserMessage;
+  final bool isAdminMessage;
 
-  Message(this.text, {this.isUserMessage = true});
+  Message(this.text, {this.isUserMessage = true, this.isAdminMessage = false});
 }
 
 class ChatScreen extends StatefulWidget {
@@ -25,14 +27,20 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_controller.text.isNotEmpty) {
       setState(() {
         _messages.add(Message(_controller.text));
-        _controller.clear();
         if (_showWelcomeMessage) {
           _showWelcomeMessage = false;
         }
       });
 
+      String userMessage = _controller.text.toLowerCase().trim();
+      _controller.clear();
+
       Timer(const Duration(seconds: 1), () {
-        _receiveMessage('¡Hola! Soy el chatbot.');
+        if (userMessage == 'usuario administrador') {
+          _receiveAdminMessage();
+        } else {
+          _receiveMessage('¡Hola! Soy el chatbot.');
+        }
       });
     }
   }
@@ -45,7 +53,20 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  void _receiveAdminMessage() {
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _messages.add(Message('Haz clic en el botón para ir al login.',
+            isUserMessage: false, isAdminMessage: true));
+      });
+    });
+  }
+
   Widget _buildMessage(Message message) {
+    if (message.isAdminMessage) {
+      return _buildAdminMessage();
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
@@ -61,6 +82,41 @@ class _ChatScreenState extends State<ChatScreen> {
           color: Colors.black87,
           fontSize: 20.0,
         ),
+      ),
+    );
+  }
+
+  Widget _buildAdminMessage() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Haz clic en el botón para ir al login:',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 20.0,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+            child: const Text('Ir a Login'),
+          ),
+        ],
       ),
     );
   }

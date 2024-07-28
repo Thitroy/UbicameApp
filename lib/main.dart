@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'firebase_options.dart';
-
 import '/pages/chat_screen.dart';
 import '/pages/google_map_page.dart';
 import '/pages/home_screen.dart';
@@ -10,20 +9,19 @@ import '/pages/login_screen.dart';
 import '/pages/splash_screen.dart';
 import '/pages/preguntas_frecuentes.dart';
 import '/pages/ubicaciones_frecuentes.dart';
+import '/pages/register_screen.dart';
+import '/preferences/pref_users.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await dotenv.load(fileName: ".env"); // Cargar variables de entorno
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await PreferencesUsers.init();
 
-  // Solicitar permisos de ubicación
   if (await Permission.location.request().isGranted) {
-    // Permiso concedido
     runApp(const MainApp());
   } else {
-    // Permiso denegado, manejar según sea necesario
     runApp(const PermissionDeniedApp());
   }
 }
@@ -40,10 +38,14 @@ class MainApp extends StatelessWidget {
         "map": (context) => const GoogleMapPage(),
         "splash": (context) => const SplashScreen(),
         "login": (context) => const LoginScreen(),
-        "home": (context) => const HomeScreen(),
+        "home": (context) => HomeScreen(
+            role:
+                PreferencesUsers().role), // Carga el rol desde las preferencias
         "chat": (context) => const ChatScreen(),
         "preguntas": (context) => PreguntasFrecuentes(),
         "ubicaciones": (context) => UbicacionesFrecuentes(),
+        "register": (context) =>
+            const RegisterScreen(), // Ruta para la pantalla de registro
       },
     );
   }
