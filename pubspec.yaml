@@ -19,18 +19,16 @@ dependencies:
   flutter_typeahead: ^5.2.0
   geocoding: ^3.0.0
   google_maps_flutter: ^2.5.0
+  mockito: ^5.4.4
   permission_handler: ^11.3.1
   video_player: ^2.9.1
-  cloud_firestore: ^5.1.0
 
 dev_dependencies:
+  build_runner: ^2.1.5
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
   mockito: ^5.0.16
-  build_runner: ^2.1.5  
-  animated_text_kit: ^4.2.1
-  flutter_spinkit: ^5.1.0
 
 flutter:
   uses-material-design: true
@@ -41,4 +39,3 @@ flutter:
     - .env
     - assets/video.mp4
     - assets/chatbot_logo.png
-    - assets/client_secret_584541029101-dj16ropqn02c7encbf8i64ajs6aj0mq4.json

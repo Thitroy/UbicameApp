@@ -1,30 +1,42 @@
-// test/services/geopoint_service_test.dart
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:ubicameapp/models/geopoint_model.dart';
 import 'package:ubicameapp/services/geopoint_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'geopoint_service_test.mocks.dart';
+import '../firebase_test_setup.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('GeoPointService', () {
+    late FirebaseApp app;
     late MockFirebaseFirestore mockFirestore;
-    late MockCollectionReference<Map<String, dynamic>> mockCollection;
-    late MockDocumentReference<Map<String, dynamic>> mockDocument;
-    late MockQuerySnapshot<Map<String, dynamic>> mockQuerySnapshot;
-    late MockQueryDocumentSnapshot<Map<String, dynamic>> mockQueryDocumentSnapshot;
+    late MockCollectionReference mockCollection;
+    late MockDocumentReference mockDocument;
+    late MockQuerySnapshot mockQuerySnapshot;
+    late MockQueryDocumentSnapshot mockQueryDocumentSnapshot;
     late GeoPointService geopointService;
 
-    setUp(() {
+    setUpAll(() async {
+      app = await initializeTestFirebase();
       mockFirestore = MockFirebaseFirestore();
-      mockCollection = MockCollectionReference<Map<String, dynamic>>();
-      mockDocument = MockDocumentReference<Map<String, dynamic>>();
-      mockQuerySnapshot = MockQuerySnapshot<Map<String, dynamic>>();
-      mockQueryDocumentSnapshot = MockQueryDocumentSnapshot<Map<String, dynamic>>();
+    });
 
-      when(mockFirestore.collection(any)).thenReturn(mockCollection);
+    setUp(() {
+      mockCollection = MockCollectionReference();
+      mockDocument = MockDocumentReference();
+      mockQuerySnapshot = MockQuerySnapshot();
+      mockQueryDocumentSnapshot = MockQueryDocumentSnapshot();
+
+      // Asegúrate de que el tipo de any coincida con el tipo esperado.
+      when(mockFirestore.collection(any as String)).thenReturn(mockCollection);
       geopointService = GeoPointService();
+    });
+
+    tearDownAll(() async {
+      await app.delete();
     });
 
     test('should add a geopoint', () async {
@@ -34,7 +46,9 @@ void main() {
         location: GeoPoint(10.0, 20.0),
       );
 
-      when(mockCollection.add(any)).thenAnswer((_) async => mockDocument);
+      // Asegúrate de que el tipo de any coincida con el tipo esperado.
+      when(mockCollection.add(any as Map<String, dynamic>))
+          .thenAnswer((_) async => mockDocument);
 
       await geopointService.addGeoPoint(geopoint);
 
@@ -49,7 +63,9 @@ void main() {
       );
 
       when(mockCollection.doc(geopoint.id)).thenReturn(mockDocument);
-      when(mockDocument.update(any)).thenAnswer((_) async => null);
+      // Asegúrate de que el tipo de any coincida con el tipo esperado.
+      when(mockDocument.update(any as Map<String, dynamic>))
+          .thenAnswer((_) async => null);
 
       await geopointService.updateGeoPoint(geopoint);
 
