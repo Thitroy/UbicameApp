@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "bionic-torch-426906-t5",
+  "private_key_id": "d65287af1c43234d27b2aa571dff213d9989db32",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDAL2xlt/EsyymJ\nx10DONsYFZ+vG9Vo60Pi1BQZfE8rVULsyRKI/wK3K2xeNN8nnobdR0r1XNRA4GI5\n6j50bQIxtRzvyGChCi+7P72hKR/GI7H8sIFmHKdeOSpMms/B0TRwJ/gjPiSU6tkx\nBAs2SU5cRJQ55CxepNq/nSzJGeTvsUV/Y1L8ApOKVk5UX37ca4MJa/0gGo5Fdl5Z\nUVpsgfP21UP/lZaoo2Ik6aAIcYk9zZf3Gm+cvsmjt5aYP5xIRnkwn0340w41apvN\n+OAE9VvzQ7JvQN6AUtKwVV+XxW+P9F/nxPqZYXLzj6oZiI74WT4FP77oDf9ywCW8\n3KXUe46/AgMBAAECggEAGTdfuqz66QyzI4/UBXM1VCCqNhip1L1hx+ZZyMpFvQLP\n6C+tzenf2lbJPkcjrJghS/FpxW3rr6OBX+X7Ud1nt0vzQwcAnsCuaJxBbl7t+1p9\npREnuVUzJKrNgQWjEuQ3RCwKY91ogV2bJ9JHAlV2AadB56Knq7dnuFKQKMbMAiL/\nK4jJJbsDZMK1GeQ2jnfPkJSkGPQX0MkInxIwvi8UjzTawc4GXZk9FSglR+smGDUz\nMO2RAqua3EPWROEiaRAmr3ffZRbhyEeNxO3XONLRT7f9JGUPKC6dGY1iScdooH3+\nkRfRZ+Nw6FLi5aRds5rNI4iiwpJuLibs3Nl9/SOKwQKBgQDhR1YGtJW6yKYwL2qI\nIhtQQwL9zBo0gemGoqWUSiUJ/tNcDK57BWiJ1VLiHmqWeW3huAa+WazuJPsTLcj9\nmzA9FXDJN8qEq9+4rT6mRyRsjczhbeCiPPaFo6fXTwMq2doJCFRQ4HfmgBxoxujt\nMhb1W/+7dJ3ik7l6U7Tr7jnEYQKBgQDaZMTnlBSaIBanIdnyv3uDl2VQu93LIpVY\nUhxIo4Ou7K6jTqnGWu2ZVWrJdp9QvkMXFluIDVCg4Ul+EMgI3PEWk48CmMZcQDyO\n+xvPYUl5ODuyD95Meyh2IOC+OWf2Dz+NHOAzH6+e2zzbblUa6cK5IClomzTJZ/B1\nxTI9d9InHwKBgAzJh9CJn5YinYxOpLVlejdsFldhpnskhKTnxo5MRx3yIP0wmxbQ\nj8aDHVlIcLRp4BrX30oevPonjzjfeHEsxegxt100lYJCX0iUTOITV7Xxtpd1LTMI\nUtXzHCvUiFF+XCn3FxIgK64hx3sLD12nYjY7KqDxVaTuzbBr3/EkbJMBAoGAF+Lt\npmaL2k+oKp+JNwO6fqoQasQhfhZKP167uTYpMPiyISp5ZziKxDqTc3WF907YB65q\nVHcgWnhJkYBEYLPJqq549c+/4lckSH8ui4AYiSmdXdxec/8EbecqraOZu0/vo3+F\nBhJxIu7XuShYJplqstTRsp9HJsA3jKoE1LRGSAECgYAMbR61Y2t8rogfzGrFJfC9\n2enhCesjSyFMlezFGKf5It+ROcJGWHSCOneeVYx0wVLWLcqlVNSd3QHtKk+0PdR6\nGocFnrP8DSGsoaSDRZkJoZPBswl3UnnxFW+2d+OoBltk2ftAmJkGiUsWRty1Z98Z\nPJo27n/56yLev0rqhXa1CQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "ubicameapp@bionic-torch-426906-t5.iam.gserviceaccount.com",
+  "client_id": "114976784540255262790",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ubicameapp%40bionic-torch-426906-t5.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
