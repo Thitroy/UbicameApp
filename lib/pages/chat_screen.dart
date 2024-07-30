@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:dialog_flowtter/dialog_flowtter.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'login_screen.dart';
+import 'ubicaciones_frecuentes.dart';
 
 class Message {
   final String text;
   final bool isUserMessage;
   final bool isAdminMessage;
+  final bool isLocationMessage;
 
-  Message(this.text, {this.isUserMessage = true, this.isAdminMessage = false});
+  Message(this.text,
+      {this.isUserMessage = true,
+      this.isAdminMessage = false,
+      this.isLocationMessage = false});
 }
 
 class ChatScreen extends StatefulWidget {
@@ -22,6 +27,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   bool _showWelcomeMessage = true;
   DialogFlowtter? dialogFlowtter;
 
@@ -56,11 +62,8 @@ class _ChatScreenState extends State<ChatScreen> {
       String userMessage = _controller.text.toLowerCase().trim();
       _controller.clear();
 
-      if (userMessage == 'usuario administrador') {
-        _receiveAdminMessage();
-      } else {
-        _handleDialogflowRequest(userMessage);
-      }
+      _handleDialogflowRequest(userMessage);
+      _scrollToBottom();
     }
   }
 
@@ -85,6 +88,11 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       _receiveMessage(responseMessage);
+      if (query.contains('darca') ||
+          query.contains('103aa') ||
+          query.contains('pace')) {
+        _receiveLocationMessage(query);
+      }
     } catch (e) {
       print("Error en Dialogflow: $e");
       _receiveMessage(
@@ -111,6 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _messages.add(Message(message, isUserMessage: false));
       });
+      _scrollToBottom();
     });
   }
 
@@ -120,12 +129,46 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.add(Message('Haz clic en el botón para ir al login.',
             isUserMessage: false, isAdminMessage: true));
       });
+      _scrollToBottom();
+    });
+  }
+
+  void _receiveLocationMessage(String userMessage) {
+    String? locationName;
+    if (userMessage.contains('darca')) {
+      locationName = 'DARCA';
+    } else if (userMessage.contains('103aa')) {
+      locationName = 'Sala 103AA';
+    } else if (userMessage.contains('pace')) {
+      locationName = 'PACE (Edificio Pregrado, primer piso)';
+    }
+
+    if (locationName != null) {
+      Timer(const Duration(seconds: 1), () {
+        setState(() {
+          _messages.add(Message('Haz clic en el botón para ver $locationName.',
+              isUserMessage: false, isLocationMessage: true));
+        });
+        _scrollToBottom();
+      });
+    }
+  }
+
+  void _scrollToBottom() {
+    Timer(const Duration(milliseconds: 300), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     });
   }
 
   Widget _buildMessage(Message message) {
     if (message.isAdminMessage) {
       return _buildAdminMessage();
+    } else if (message.isLocationMessage) {
+      return _buildLocationMessage(message.text);
     }
 
     return Container(
@@ -176,6 +219,42 @@ class _ChatScreenState extends State<ChatScreen> {
               );
             },
             child: const Text('Ir a Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationMessage(String locationText) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            locationText,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 20.0,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UbicacionesFrecuentes()),
+              );
+            },
+            child: const Text('Ver Ubicación'),
           ),
         ],
       ),
@@ -259,6 +338,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                     ListView.builder(
+                      controller: _scrollController,
                       padding: const EdgeInsets.all(8.0),
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {

@@ -148,7 +148,7 @@ class _UbicacionesFrecuentesState extends State<UbicacionesFrecuentes> {
                         ),
                       ),
                       subtitle: Text(
-                        ubicacion['direccion'],
+                        '', // No mostrar las coordenadas
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[300],
@@ -196,7 +196,7 @@ class _UbicacionesFrecuentesState extends State<UbicacionesFrecuentes> {
 
   Future<void> _goToLocation(LatLng position) async {
     _mapController.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: position, zoom: 15),
+      CameraPosition(target: position, zoom: 18), // Ajustar zoom a 18
     ));
   }
 
