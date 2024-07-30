@@ -33,8 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _initializeDialogFlowtter() async {
     try {
-      DialogAuthCredentials credentials =
-          await DialogAuthCredentials.fromFile('assets/');
+      DialogAuthCredentials credentials = await DialogAuthCredentials.fromFile(
+          'assets/bionic-torch-426906-t5-ed5338923876.json');
       dialogFlowtter = DialogFlowtter(credentials: credentials);
       print('DialogFlowtter initialized successfully.');
       setState(() {});

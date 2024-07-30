@@ -33,6 +33,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC_DKpvMsOUkyeAT8snr7-0du61pEYq5Mc" />
+        <meta-data
+            android:name="com.google.android.gms.security.ProviderInstaller"
+            android:value="true" />
     </application>
 
     <queries>
