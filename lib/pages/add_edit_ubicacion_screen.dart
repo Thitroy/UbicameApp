@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class AddEditUbicacionScreen extends StatefulWidget {
   final String? id;
@@ -14,9 +17,11 @@ class AddEditUbicacionScreen extends StatefulWidget {
 
 class _AddEditUbicacionScreenState extends State<AddEditUbicacionScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -47,6 +52,16 @@ class _AddEditUbicacionScreenState extends State<AddEditUbicacionScreen> {
       return 'La dirección debe estar en formato (ej: -36.8212801,-73.0141550)';
     }
     return null;
+  }
+
+  Future<void> _pickImage() async {
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _selectedImage = File(pickedImage.path);
+      });
+    }
   }
 
   @override
@@ -85,6 +100,18 @@ class _AddEditUbicacionScreenState extends State<AddEditUbicacionScreen> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                onPressed: _pickImage,
+                child: Text("Seleccionar Imagen"),
+              ),
+              _selectedImage != null
+                  ? Image.file(
+                      _selectedImage!,
+                      width: 100,
+                      height: 100,
+                    )
+                  : Container(),
+              SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: _saveUbicacion,
                 child: Text(widget.id == null ? "Guardar" : "Actualizar"),
               ),
@@ -95,14 +122,25 @@ class _AddEditUbicacionScreenState extends State<AddEditUbicacionScreen> {
     );
   }
 
-  void _saveUbicacion() async {
+  Future<void> _saveUbicacion() async {
     if (_formKey.currentState?.validate() ?? false) {
       var nombre = _nombreController.text;
       var direccion = _direccionController.text;
+      String? imageUrl;
+
+      if (_selectedImage != null) {
+        final ref = _storage
+            .ref()
+            .child('ubicaciones/${DateTime.now().toString()}.jpg');
+        await ref.putFile(_selectedImage!);
+        imageUrl = await ref.getDownloadURL();
+      }
+
       if (widget.id == null) {
         await _firestore.collection('ubicaciones_frecuentes').add({
           'nombre': nombre,
           'direccion': direccion,
+          'imageUrl': imageUrl,
         });
       } else {
         await _firestore
@@ -111,6 +149,7 @@ class _AddEditUbicacionScreenState extends State<AddEditUbicacionScreen> {
             .update({
           'nombre': nombre,
           'direccion': direccion,
+          'imageUrl': imageUrl,
         });
       }
       Navigator.pop(context);
