@@ -154,6 +154,16 @@ class _UbicacionesFrecuentesState extends State<UbicacionesFrecuentes> {
                           color: Colors.grey[300],
                         ),
                       ),
+                      leading: ubicacion.data() != null &&
+                              (ubicacion.data() as Map<String, dynamic>)
+                                  .containsKey('imageUrl')
+                          ? Image.network(ubicacion['imageUrl'])
+                          : Container(
+                              width: 50,
+                              height: 50,
+                              color: Colors.grey,
+                              child: Icon(Icons.image, color: Colors.white),
+                            ),
                       tileColor: Colors.indigo[600],
                       onTap: () {
                         _updateMarkersAndRoute(location);
