@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart';
-import 'register_screen.dart';
+import 'reset_password_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ubicameapp/preferences/pref_users.dart';
 import '/util/snackbar.dart';
@@ -194,11 +194,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const RegisterScreen()),
+                                builder: (context) =>
+                                    const ResetPasswordScreen()),
                           );
                         },
                         child: const Text(
-                          '¿No tienes cuenta?',
+                          '¿Olvidaste tu contraseña?',
                           style: TextStyle(
                             color: Colors.white,
                             decoration: TextDecoration.underline,

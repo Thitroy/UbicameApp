@@ -43,30 +43,30 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
     switch (index) {
-      case 0:
+      /*case 0:
         Navigator.pushNamed(context, "map");
-        break;
-      case 1:
+        break;*/
+      case 0:
         Navigator.pushNamed(context, "chat");
         break;
-      case 2:
+      case 1:
         Navigator.pushNamed(context, "preguntas");
         break;
-      case 3:
+      case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UbicacionesFrecuentes()),
         );
         break;
-      case 4:
+      case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const RegisterScreen()),
         );
         break;
-      case 5:
+      /*case 5:
         // Implementa la navegación para crear ubicaciones
-        break;
+        break;*/
     }
   }
 
@@ -178,10 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         items: widget.role == 'admin'
             ? const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
+                /*BottomNavigationBarItem(
                   icon: Icon(Icons.map),
                   label: 'Mapa',
-                ),
+                ),*/
                 BottomNavigationBarItem(
                   icon: Icon(Icons.chat),
                   label: 'Chat',
@@ -198,16 +198,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.person_add),
                   label: 'Crear Usuario',
                 ),
-                BottomNavigationBarItem(
+                /*BottomNavigationBarItem(
                   icon: Icon(Icons.location_on),
                   label: 'Crear Ubicación',
-                ),
+                ),*/
               ]
             : const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
+                /*BottomNavigationBarItem(
                   icon: Icon(Icons.map),
                   label: 'Mapa',
-                ),
+                ),*/
                 BottomNavigationBarItem(
                   icon: Icon(Icons.chat),
                   label: 'Chat',
