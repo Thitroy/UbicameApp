@@ -43,9 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
     switch (index) {
-      /*case 0:
-        Navigator.pushNamed(context, "map");
-        break;*/
       case 0:
         Navigator.pushNamed(context, "chat");
         break;
@@ -64,9 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(builder: (context) => const RegisterScreen()),
         );
         break;
-      /*case 5:
-        // Implementa la navegación para crear ubicaciones
-        break;*/
     }
   }
 
@@ -178,10 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         items: widget.role == 'admin'
             ? const <BottomNavigationBarItem>[
-                /*BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
-                  label: 'Mapa',
-                ),*/
                 BottomNavigationBarItem(
                   icon: Icon(Icons.chat),
                   label: 'Chat',
@@ -198,16 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icon(Icons.person_add),
                   label: 'Crear Usuario',
                 ),
-                /*BottomNavigationBarItem(
-                  icon: Icon(Icons.location_on),
-                  label: 'Crear Ubicación',
-                ),*/
               ]
             : const <BottomNavigationBarItem>[
-                /*BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
-                  label: 'Mapa',
-                ),*/
                 BottomNavigationBarItem(
                   icon: Icon(Icons.chat),
                   label: 'Chat',
@@ -222,7 +204,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        backgroundColor: Colors.indigo[800], // Azul oscuro
         onTap: _onItemTapped,
       ),
     );
