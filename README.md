@@ -24,9 +24,3 @@ La aplicación será abierta para cualquier persona que busque orientación en l
 - [Analista de Diseño | Wilson Moreno](https://github.com/TheDanger01)
 - [Testing | Carlos Sánchez](https://github.com/CarlxsSc)
 - [Lider de Proyecto | Abel Rosales](https://github.com/CometArao)
-
-### Trello del equipo
-[Trello de equipo](https://trello.com/w/gpsappmovil)
-
-### Diseños en Figma
---- EN DESARROLLO ---
